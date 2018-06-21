@@ -8,6 +8,13 @@ public:
 		channels = 4;
 		width = w; height = h; this->channels = channels;
 		pixels = new unsigned char[w*h*channels];
+
+		/*pixels = (unsigned char*)malloc((w*h*channels));
+
+
+		for (int i = 0; i < w*h*channels; i++) {
+			pixels[i] = 255;
+		}*/
 	}
 
 	Image(Image* image) {
@@ -155,9 +162,11 @@ public:
 
 	Image* operator= (Image* image) {
 		channels = 4;
-		width = image->width; height = image->height; this->channels = channels;
+		width = image->width; height = image->height;
 
 		int size = width*height*channels;
+		delete pixels;
+
 		pixels = new unsigned char[size];
 
 		for (int i = 0; i < size; i++) {
@@ -254,6 +263,24 @@ public:
 		}
 		return *this;
 	}
+
+	void Scale(float scale) {
+
+		Image* n = new Image(width*scale, height*scale);
+
+		for (int x = 0; x < (int)(width*scale); x++) {
+			for (int y = 0; y < (int)(height*scale); y++)
+			{
+				n->setPixel(GetPixel(x*width / (width*scale), y* height /(height*scale)), x, y);
+			}
+		}
+
+		*this = n;
+
+		delete n;
+	}
+
+	static void CreateIlluminationMap(Image* img, Image& out, int scale = 1);
 	
 
 	int getWidth() { return width; }

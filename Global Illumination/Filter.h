@@ -188,7 +188,7 @@ public:
 
 	}
 
-	static void ApplyGrayscale(Image* img, Image& out, Vector3 f = Vector3(1, 1, 1)) {
+	static void ApplyGrayscale(Image* img, Image& out, Vector3 f = Vector3(1, 1, 1), bool average = true) {
 
 		Image _out = &out;
 
@@ -197,7 +197,7 @@ public:
 			{
 
 				Color c = img->GetPixel(x, y);
-				float _c = (c.r*f.x + c.g*f.y + c.b*f.z) / 3.0f;
+				float _c = (c.r*f.x + c.g*f.y + c.b*f.z) / (average? 3.0f : 1);
 
 				_out.setPixel(Color(_c, _c, _c, c.a), x, y);
 			}
@@ -270,6 +270,29 @@ public:
 				img->setPixel(c, x, y);
 			}
 		}
+	}
+
+	static void ApplyToneMapping(Image* img, Image& out, float a, int scale = 1) { //scale >= 1 && scale % 2 = 0
+		a = (a < 1.0f) ? 1.0f : a;
+		scale = (scale < 1) ? 1 : scale;
+		//scale = (scale % 2 != 0) ? 1 : scale;
+
+		Image _out = &out;
+
+		Image ilumination = Image(img->getWidth() / scale, img->getHeight() / scale);
+		Image::CreateIlluminationMap(img, ilumination, scale);
+
+		ilumination.ExportBMP("ilum " + std::to_string(scale));
+
+		for (int x = 0; x < img->getWidth(); x++) {
+			for (int y = 0; y < img->getHeight(); y++) {
+
+				Color c = (img->GetPixel(x, y) * (a / ilumination.GetPixel(x/scale, y/scale).r))+ img->GetPixel(x, y);
+				_out.setPixel(c, x, y);
+			}
+		}
+
+		out = &_out;
 	}
 	
 };

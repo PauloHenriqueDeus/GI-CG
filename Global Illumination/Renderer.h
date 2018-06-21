@@ -75,7 +75,7 @@ public:
 			}
 		}
 
-
+		if (NPR())
 		{
 			Image stroke = nprStroke;
 			Filter::ApplySobel(&stroke, stroke);
@@ -106,9 +106,25 @@ public:
 
 			stroke.ExportBMP("mask");
 		}
+		else {
+
+			Image hdr = display;
+
+			for (int scale = 0; scale <= 20; scale+=2) {
+				Filter::ApplyToneMapping(display, hdr, 2.f, scale);
+				hdr.InvertY();
+
+				int s = (720 / ((scale == 0) ? 1 : scale));
+
+				hdr.ExportBMP("hdr scale " + std::to_string(s) + " px");
+				hdr = display;
+			}		
+		}
 
 
 		display->InvertY();
+
+
 		nprStroke->InvertY();
 		ExportImage();
 	}
