@@ -57,10 +57,21 @@ public:
 
 	Vector3 GetForward() {
 
-		float x = sinf(rotation.y * 0.0174533f);
-		float z = cosf(rotation.y * 0.0174533f);
+		float x;
+		float z;
+		if (rotation.x != 0) {
+			x = sinf(rotation.x * 0.0174533f);
+			z = cosf(rotation.x * 0.0174533f);
 
-		return Vector3(x, 0, z);
+			return Vector3(0, x, z);
+		}
+		else {
+			x = sinf(rotation.y * 0.0174533f);
+			z = cosf(rotation.y * 0.0174533f);
+
+			return Vector3(x, 0, z);
+
+		}
 	}
 
 	Vector3 GetRight() {

@@ -30,6 +30,8 @@ public:
 		g = rgb.y;
 		b = rgb.z;
 		a = _a;
+
+		Clamp();
 	}
 	~Color();
 
@@ -41,9 +43,9 @@ public:
 
 		Color r = *this;
 
-		r.r = r.r * r.a + c.r * (c.a);
-		r.g = r.g * r.a + c.g * (c.a);
-		r.b = r.b * r.a + c.b * (c.a);
+		r.r = r.r * r.a + c.r * c.a;
+		r.g = r.g * r.a + c.g * c.a;
+		r.b = r.b * r.a + c.b * c.a;
 
 		r.Clamp();
 
@@ -57,11 +59,60 @@ public:
 		return *this;
 	}
 
+	Color operator* (Color& c) {
+		Color _r;
+
+		_r.r = this->r * c.r;
+		_r.g = this->g * c.g;
+		_r.b = this->b * c.b;
+
+		_r.Clamp();
+
+		return _r;
+	}
+
 	void Clamp() {
+
+		r = (r < 0.0f) ? 0.0f : r;
+		g = (g < 0.0f) ? 0.0f : g;
+		b = (b < 0.0f) ? 0.0f : b;
+		a = (a < 0.0f) ? 0.0f : a;
+
 		r = (r > 1.0f) ? 1.0f : r;
 		g = (g > 1.0f) ? 1.0f : g;
 		b = (b > 1.0f) ? 1.0f : b;
 		a = (a > 1.0f) ? 1.0f : a;
+
+	}
+
+	bool operator==(Color& c) {
+		return (r == c.r && g == c.g && b == c.b);
+	}
+
+	static Color Avarage(Color a, Color b) {
+
+		Color c;
+
+		c.r = (a.r + b.r)/2;
+		c.g = (a.g + b.g)/2;
+		c.b = (a.b + b.b)/2;
+
+		c.a = (a.a > b.a) ? a.a : b.a;
+
+		return c;
+
+	}
+
+	static Color Lerp(Color a, Color b, float t) {
+		Color c;
+
+		c.r = (1 - t) * a.r + t * b.r;
+		c.g = (1 - t) * a.g + t * b.g;
+		c.b = (1 - t) * a.b + t * b.b;
+
+		c.a = (a.a > b.a) ? a.a : b.a;
+
+		return c;
 	}
 
 	static Color colorConverter(std::string hexValue, int alpha)
@@ -84,6 +135,10 @@ public:
 		c.g = c.g*f;
 		c.b = c.b*f;
 		return c;
+	}
+
+	static Color White() {
+		return Color(1.f, 1.f, 1.f, 1.f);
 	}
 };
 

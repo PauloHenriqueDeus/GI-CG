@@ -14,6 +14,13 @@ public:
 
 		fov = 60.0f;
 	}
+	Camera(Vector3 pos, Vector3 rot, float _fov) {
+		transform.Rotate(Vector3(0, 180, 0));
+		transform.Move(pos);
+		transform.Rotate(rot);
+
+		fov = _fov;
+	}
 	~Camera();
 
 	Transform* GetTransform() {

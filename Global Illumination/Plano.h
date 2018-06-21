@@ -6,7 +6,7 @@ class Plano : public Object
 private:
 
 public:
-	Plano(Vector3 position, Material* _material) :Object(position, _material) {
+	Plano(Vector3 position, Vector3 rotation, Material* _material) :Object(position, rotation, _material) {
 		
 
 	}

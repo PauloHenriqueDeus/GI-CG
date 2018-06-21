@@ -1,0 +1,5 @@
+camera 0 0 -20 0 0 0 60
+sphere 0 0 -30 0 0 0 5 material3
+sphere 0 0 -130 0 0 0 5 material2
+plane 9 0 -100 0 20 0 15 15 material
+light 0 0 0 1 1 1

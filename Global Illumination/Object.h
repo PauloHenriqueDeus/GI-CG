@@ -6,28 +6,18 @@
 
 class Object
 {
-private:
-	static std::vector<Object*>objects;
-
 protected:
 	Transform transform;
 	Material* mat;
 
 
-	Object(Vector3 position, Material* _mat) {
-		transform.Move(position);
-		objects.push_back(this);
-		mat = _mat;
-	}
+	Object(Vector3 position, Vector3 rotation, Material* _mat);
 	~Object();
 
 public:
-	static Object** GetObjects() {
-		return objects.data();
-	}
-	static int GetObjectsLenght() {
-		return objects.size();
-	}
+	static std::vector<Object*>* GetObjects();
+
+	static int GetObjectsLenght();
 
 	virtual bool RayCast(Ray* ray, Vector3& hit) = 0;
 

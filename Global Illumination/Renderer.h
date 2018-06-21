@@ -8,6 +8,7 @@
 #include "Ray.h"
 #include "Object.h"
 #include "Light.h"
+#include "Filter.h"
 
 class Renderer
 {
@@ -15,13 +16,18 @@ private:
 	int windowW;
 	int windowH;
 
-	Camera camera;
+	bool npr;
 
+	Camera camera;
 	Image *display;
+	Image *nprStroke;
+
+	static Renderer* renderer;
 public:
 	Renderer(int x, int y) {
 		windowW = x;
 		windowH = y;
+		renderer = this;
 	}
 	~Renderer();
 
@@ -29,35 +35,28 @@ public:
 		return display;
 	}
 
+	static void SetCamera(Camera c) {
+		renderer->camera = c;
+	}
+
 	bool Initialize() {
 
 		display = new Image(windowW, windowH);
-
-		/*for (int i = 0; i < display->getWidth(); i++) {
-			for (int j = 0; j < display->getHeight(); j++) {
-				display->setPixel(Color(
-					(i < display->getWidth() / 2) ? 1.0f - (2 * (float)i / display->getWidth()) : 0.0f,
-					(i < display->getWidth() / 2) ? 0.0f : 1.0f - (2 - 2 * (float)i / display->getWidth()),
-					(i < display->getWidth() / 2) ? 2 * (float)i / display->getWidth() : 2 - 2 * (float)i / display->getWidth(),
-					1.0f), i, j);
-			}
-		}*/
-
-		for (int i = 0; i < display->getWidth(); i++) {
-			for (int j = 0; j < display->getHeight(); j++) {
-				display->setPixel(Color(0.0f, 0.0f, 0.0f, 1.0f), i, j);
-			}
-		}
+		nprStroke = new Image(windowW, windowH);
 
 		return true;
 	}
 
-	void Render() {
+	void ClearBuffer() {
+		free(display);
+	}
 
+	void Render() {
 		float aspectRatio = (float)display->getWidth() / display->getHeight();
 		Vector3 origem = *camera.GetTransform()->GetPosition();
 
 		Ray* ray;
+		Color nprMask;
 
 		for (int i = 0; i < display->getWidth(); i++) {
 			for (int j = 0; j < display->getHeight(); j++) {
@@ -67,15 +66,56 @@ public:
 				Vector3 dir = (Vector3(x, y, -1)).Normalized();
 
 				ray = new Ray(*camera.GetTransform()->GetPosition(), dir*100.0f);
-				display->setPixel(RayTracing(ray, 2, 1.0f), i, j);
+
+
+				display->setPixel(RayTracing(ray, 2, 1.0f, &nprMask), i, j);
+				nprStroke->setPixel(nprMask, i, j);
+				nprMask = Color();
 				delete ray;
 			}
 		}
-		display->InvertY();
 
+
+		{
+			Image stroke = nprStroke;
+			Filter::ApplySobel(&stroke, stroke);
+			Filter::ApplyGrayscale(&stroke, stroke);
+
+			Image perlin = Image(display->getWidth(), display->getHeight());
+			Image::PerlinNoise(&perlin, perlin.getWidth() / 10);
+			Filter::ApplyInvert(&perlin, perlin);
+
+			Image::Blend(&stroke, &perlin, Image::BlendMode::Multiply);
+
+			Filter::ApplyBinary(&stroke, stroke, 0.2f);
+			stroke *= Color(1.f, 1.f, 1.f, 1.f);
+
+			Filter::CreateMask(&stroke, stroke);
+
+			perlin = Image(display->getWidth(), display->getHeight());
+			Image::PerlinNoisePre(&perlin, perlin.getWidth()/8);
+			Filter::ApplyInvert(&perlin, perlin);
+			Image::Blend(display, &perlin, Image::BlendMode::Multiply);
+			//perlin.ExportBMP("perlin");
+
+			//Filter::ApplyPerlinNoise(&perlin, perlin.getWidth() / 10);
+			perlin.ExportBMP("perlin");
+
+
+			Image::Blend(display, &stroke, Image::BlendMode::Normal);
+
+			stroke.ExportBMP("mask");
+		}
+
+
+		display->InvertY();
+		nprStroke->InvertY();
+		ExportImage();
 	}
 
-	Color RayTracing(Ray* ray, int depht, float refraction) {
+	void ExportImage();
+
+	Color RayTracing(Ray* ray, int depht, float refraction, Color* NPRMask) {
 
 		Color pixel;
 
@@ -87,7 +127,7 @@ public:
 			for (int o = 0; o < Object::GetObjectsLenght(); o++)
 			{
 				Vector3 hit;
-				if (Object::GetObjects()[o]->RayCast(ray, hit)) {
+				if (Object::GetObjects()->at(o)->RayCast(ray, hit)) {
 
 					float od = (hit - (*ray->GetOrigin())).Magnitude();
 					if (od < d || d == 0) {
@@ -96,28 +136,29 @@ public:
 							d = (hit - (*ray->GetOrigin())).Magnitude();
 
 
-							Vector3 n = Object::GetObjects()[o]->Normal(hit).Normalized();
+							Vector3 n = Object::GetObjects()->at(o)->Normal(hit).Normalized();
 
 							Color rt;
 
-							float reflex = Object::GetObjects()[o]->GetMaterial()->GetReflex();
+							float reflex = Object::GetObjects()->at(o)->GetMaterial()->GetReflex();
 							if (reflex > 0) {
-								Vector3 ran = Vector3(powf(float(rand() % 100) / 100, 2), powf(float(rand() % 100) / 100, 2), powf(float(rand() % 100) / 100, 2)) * (1-reflex)*.5f
-									+(ray->GetDirection()->Normalized().Reflection(&n));
+								Vector3 ran = Vector3(powf(float(rand() % 100) / 100, 2), powf(float(rand() % 100) / 100, 2), powf(float(rand() % 100) / 100, 2)) * (1 - reflex)*.5f
+									+ (ray->GetDirection()->Normalized().Reflection(&n));
 
 								Ray* r = new Ray(hit, (ran).Normalized()*ray->GetSize());
-								rt = rt + (RayTracing(r, depht, refraction) >> reflex);
+								rt = rt + (RayTracing(r, depht, refraction, NPRMask) >> reflex);
 								delete r;
 							}
 
-							float refr = Object::GetObjects()[o]->GetMaterial()->GetRefractionConstant();
-							if (Object::GetObjects()[o]->GetMaterial()->GetTransm() > 0) {
+							float refr = Object::GetObjects()->at(o)->GetMaterial()->GetRefractionConstant();
+							if (Object::GetObjects()->at(o)->GetMaterial()->GetTransm() > 0) {
 								Ray* r = new Ray(hit, (ray->GetDirection()->Normalized().Refraction(&n, refraction, refr) *ray->GetSize()));
-								rt = rt + (RayTracing(r, depht, refraction) >> Object::GetObjects()[o]->GetMaterial()->GetTransm());
+								rt = rt + (RayTracing(r, depht, refraction, NPRMask) >> Object::GetObjects()->at(o)->GetMaterial()->GetTransm());
 								delete r;
 							}
 
-							pixel =  (Light::PixelColor(ray, &hit, &n, o) + rt);
+
+							pixel = (Light::PixelColor(ray, &hit, &n, o, NPRMask) + rt);
 						}
 					}
 
@@ -131,8 +172,19 @@ public:
 			return pixel;
 		}
 
+		
 	}
 
+	static void SetNPR(bool _b) {
+		renderer->npr = _b;
+	}
 
+	static bool NPR() {
+		return renderer->npr;
+	}
+
+	static Image* NPRImage() {
+		return renderer->nprStroke;
+	}
 };
 

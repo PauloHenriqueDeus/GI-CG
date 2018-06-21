@@ -4,7 +4,7 @@
 class AACube : public Object
 {
 public:
-	AACube(Vector3 position, Vector3 size, Material* _material) :Object(position, _material) {
+	AACube(Vector3 position, Vector3 rotation, Vector3 size, Material* _material) :Object(position, rotation, _material) {
 		transform.SetScale(size);
 	}
 	~AACube();

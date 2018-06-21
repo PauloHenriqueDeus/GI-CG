@@ -1,13 +1,5 @@
-﻿  Renderer.cpp
-c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\image.h(19): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\material.h(16): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+﻿  main.cpp
+c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\image.h(37): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
 c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\material.h(73): warning C4018: '<': signed/unsigned mismatch
-c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\light.h(13): warning C4305: 'argument': truncation from 'double' to 'float'
-c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\light.h(34): warning C4018: '<': signed/unsigned mismatch
-c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\renderer.h(64): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\renderer.h(65): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  Generating Code...
-  Skipping... (no relevant changes detected)
-  main.cpp
   Global Illumination.vcxproj -> C:\Users\paulo\Documents\Visual Studio 2015\Projects\Global Illumination\Debug\Global Illumination.exe
   Global Illumination.vcxproj -> C:\Users\paulo\Documents\Visual Studio 2015\Projects\Global Illumination\Debug\Global Illumination.pdb (Partial PDB)

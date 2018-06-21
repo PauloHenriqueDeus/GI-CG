@@ -19,6 +19,7 @@
 #include "wtypes.h"
 #include "Light.h"
 #include "Cube.h"
+#include "Scene.h"
 
 int windowW = 1024;
 int windowH = 720;
@@ -58,19 +59,18 @@ void Display() {
 	glutSwapBuffers();
 }
 
+void Idle() {
+
+}
+
 bool InitGL() {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	//glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 	glClearDepth(1.0f);
-
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	renderer->Initialize();
 
 	return true;
@@ -79,21 +79,7 @@ bool InitGL() {
 int main(int argc, char** argv) {
 
 	renderer = new Renderer(windowW, windowH);
-	Sphere* sphere  = new Sphere(Vector3( 0, 0, -50), 5, Material::LoadMaterial("material"));
-	Sphere* sphere2 = new Sphere(Vector3(-8, 0, -70), 5, Material::LoadMaterial("material2"));
-
-	AACube* p = new AACube(Vector3(25, 0, -50), Vector3(50, 50, 1), Material::GetMaterial("material2"));
-	//AACube* p2 = new AACube(Vector3(-25, 0, -50), Vector3(50, 50, 1), Material::GetMaterial("material2"));
-	//AACube* p3 = new AACube(Vector3(0, 0, -50-25), Vector3(50, 50, 1), Material::GetMaterial("material2"));
-
-	p->GetTransform()->Rotate(Vector3(0, -90, 0));
-	//p2->GetTransform()->Rotate(Vector3(0, 90, 0));
-
-	Light light = Light(Vector3(8, 0, 0), 10);
-	//Light light2 = Light(Vector3(-8, 0, -80), 10);
-
-	/*windowW = width;
-	windowH = height;*/
+	Scene::LoadSceneList("sceneList");
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -109,35 +95,18 @@ int main(int argc, char** argv) {
 
 	if (!InitGL()) { return 1; }
 
-	/*Para cada pixel da imagem
-	Calcular raio que passa pelo pixel e pelo olho
-	Determinar objeto atingido pelo raio
-	Ponto de intersecção
-	Normal
-	Propriedades de material
-	Propriedades de textura
-	Computar contribuição da iluminação ambiente
-	Para cada fonte de luz, determinar a visibilidade(raio de
-	sombra)
-	Se fonte visível, somar contribuição da reflexão difusa
-	Se o limite de recursão não foi atingido
-	Somar contribuição da reflexão especular
-	acompanhando raio refletido
-	Somar contribuição de transmissão acompanhando raio
-	refratado*/
-	lastTime = glutGet(GLUT_ELAPSED_TIME);
-
-
-	//RayTracing();
-	renderer->Render();
-
-
-	ElapsedTime();
+	do {
+		lastTime = glutGet(GLUT_ELAPSED_TIME);
+		renderer->Render();
+		ElapsedTime();
+	} while (Scene::NextScene());
+	
+	Scene::UnloadScene();
 
 	//glutFullScreen();
 
 	glutDisplayFunc(Display);
-	glutIdleFunc(Display);
+	glutIdleFunc(Idle);
 
 	glutMainLoop();
 

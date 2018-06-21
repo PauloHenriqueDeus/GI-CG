@@ -5,7 +5,7 @@
 class Sphere : public Object
 {
 public:
-	Sphere(Vector3 position, float radius, Material* _material) :Object(position, _material) {
+	Sphere(Vector3 position, Vector3 rotation, float radius, Material* _material) :Object(position, rotation, _material) {
 		transform.SetScale(Vector3(1, 1, 1) * radius);
 	}
 	~Sphere() {};
