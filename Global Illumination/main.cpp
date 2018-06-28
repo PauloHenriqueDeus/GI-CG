@@ -21,8 +21,8 @@
 #include "Cube.h"
 #include "Scene.h"
 
-int windowW = 1024;
-int windowH = 720;
+int windowW = 640; //640
+int windowH = 360; //360
 
 Renderer* renderer;
 
@@ -78,6 +78,7 @@ bool InitGL() {
 
 int main(int argc, char** argv) {
 
+	bool gi = true;
 	renderer = new Renderer(windowW, windowH);
 	Scene::LoadSceneList("sceneList");
 
@@ -95,13 +96,33 @@ int main(int argc, char** argv) {
 
 	if (!InitGL()) { return 1; }
 
-	do {
-		lastTime = glutGet(GLUT_ELAPSED_TIME);
-		renderer->Render();
-		ElapsedTime();
-	} while (Scene::NextScene());
-	
-	Scene::UnloadScene();
+	if (gi) {
+		do {
+			lastTime = glutGet(GLUT_ELAPSED_TIME);
+			renderer->Render();
+			ElapsedTime();
+		} while (Scene::NextScene());
+
+		Scene::UnloadScene();
+	}
+	else {
+		/*
+		Image image = Image("image.bmp");
+		Filter::ApplyToneMapping(&image, image, .5f, 720/1);
+		image.ExportBMP("imageHdr-050-720");
+
+		renderer->RenderImage(&image);*/
+
+		Image perlin = Image(windowW, windowH);
+		Image::PerlinNoisePre(&perlin, 60);
+
+		perlin *= Color(1.f, .5f, 0.f, 1.f);
+
+		//Filter::ApplyInvert(&perlin, perlin);
+		perlin.ExportBMP("perlin");
+
+		renderer->RenderImage(&perlin);
+	}
 
 	//glutFullScreen();
 

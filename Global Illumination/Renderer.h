@@ -82,8 +82,9 @@ public:
 			Filter::ApplyGrayscale(&stroke, stroke);
 
 			Image perlin = Image(display->getWidth(), display->getHeight());
-			Image::PerlinNoise(&perlin, perlin.getWidth() / 10);
-			Filter::ApplyInvert(&perlin, perlin);
+			Image::PerlinNoisePre(&perlin, 60);
+			Filter::ApplyBinary(&perlin, perlin, 0.6f);
+			//Filter::ApplyInvert(&perlin, perlin);
 
 			Image::Blend(&stroke, &perlin, Image::BlendMode::Multiply);
 
@@ -93,12 +94,12 @@ public:
 			Filter::CreateMask(&stroke, stroke);
 
 			perlin = Image(display->getWidth(), display->getHeight());
-			Image::PerlinNoisePre(&perlin, perlin.getWidth()/8);
-			Filter::ApplyInvert(&perlin, perlin);
+			Image::PerlinNoisePre(&perlin, 80);
+
+			//Filter::ApplyInvert(&perlin, perlin);
 			Image::Blend(display, &perlin, Image::BlendMode::Multiply);
 			//perlin.ExportBMP("perlin");
 
-			//Filter::ApplyPerlinNoise(&perlin, perlin.getWidth() / 10);
 			perlin.ExportBMP("perlin");
 
 
@@ -109,16 +110,9 @@ public:
 		else {
 
 			Image hdr = display;
-
-			for (int scale = 0; scale <= 20; scale+=2) {
-				Filter::ApplyToneMapping(display, hdr, 2.f, scale);
-				hdr.InvertY();
-
-				int s = (720 / ((scale == 0) ? 1 : scale));
-
-				hdr.ExportBMP("hdr scale " + std::to_string(s) + " px");
-				hdr = display;
-			}		
+			Filter::ApplyToneMapping(display, hdr, .72f, 1);
+			hdr.InvertY();
+			hdr.ExportBMP("hdr scale 1 px");
 		}
 
 
@@ -201,6 +195,15 @@ public:
 
 	static Image* NPRImage() {
 		return renderer->nprStroke;
+	}
+
+	static void RenderImage(Image* image) {
+
+		for (int i = 0; i < renderer->display->getWidth() && i < image->getWidth(); i++) {
+			for (int j = 0; j < renderer->display->getHeight() && j < image->getHeight(); j++) {
+				renderer->display->setPixel(image->GetPixel(i, j), i, j);
+			}
+		}
 	}
 };
 

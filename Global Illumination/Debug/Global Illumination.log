@@ -2,10 +2,10 @@
 c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\material.h(16): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
 c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\material.h(73): warning C4018: '<': signed/unsigned mismatch
 c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\light.h(13): warning C4305: 'argument': truncation from 'double' to 'float'
-c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\image.h(44): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\image.h(236): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\image.h(269): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\image.h(274): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\image.h(84): warning C4018: '<': signed/unsigned mismatch
+c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\image.h(110): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
+c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\image.h(341): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\image.h(346): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
 c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\filter.h(111): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
 c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\filter.h(126): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
 c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\filter.h(127): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
@@ -24,13 +24,12 @@ c:\users\paulo\documents\visual studio 2015\projects\global illumination\global 
 c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\filter.h(269): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\renderer.h(63): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\renderer.h(64): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\renderer.h(85): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\renderer.h(96): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
 c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\light.cpp(30): warning C4018: '<': signed/unsigned mismatch
   Generating Code...
   Compiling...
   main.cpp
-c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\image.h(44): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
+c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\image.h(84): warning C4018: '<': signed/unsigned mismatch
+c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\image.h(110): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
 c:\users\paulo\documents\visual studio 2015\projects\global illumination\global illumination\material.h(73): warning C4018: '<': signed/unsigned mismatch
   Generating Code...
   Skipping... (no relevant changes detected)

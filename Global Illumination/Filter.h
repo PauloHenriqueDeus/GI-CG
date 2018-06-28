@@ -273,7 +273,31 @@ public:
 	}
 
 	static void ApplyToneMapping(Image* img, Image& out, float a, int scale = 1) { //scale >= 1 && scale % 2 = 0
-		a = (a < 1.0f) ? 1.0f : a;
+		a = (a > 1.0f) ? 1.0f : a;
+		scale = (scale < 1) ? 1 : scale;
+		//scale = (scale % 2 != 0) ? 1 : scale;
+
+		Image _out = &out;
+
+		Image ilumination = Image(img->getWidth(), img->getHeight());
+		Image::CreateIlluminationMap(img, ilumination, scale);
+
+		ilumination.ExportBMP("ilum " + std::to_string(scale));
+
+		for (int x = 0; x < img->getWidth(); x++) {
+			for (int y = 0; y < img->getHeight(); y++) {
+				//Color c = (img->GetPixel(x, y) * (a / ilumination.GetPixel(x/scale, y/scale).r))+ img->GetPixel(x, y);
+
+				Color c = (img->GetPixel(x, y) * (a / ilumination.GetPixel(x, y).r)) + img->GetPixel(x, y);
+				_out.setPixel(c, x, y);
+			}
+		}
+
+		out = &_out;
+	}
+
+	static void ApplyMyToneMapping(Image* img, Image& out, float a, int scale = 1) { //scale >= 1 && scale % 2 = 0
+		a = (a > 1.0f) ? 1.0f : a;
 		scale = (scale < 1) ? 1 : scale;
 		//scale = (scale % 2 != 0) ? 1 : scale;
 
@@ -281,13 +305,18 @@ public:
 
 		Image ilumination = Image(img->getWidth() / scale, img->getHeight() / scale);
 		Image::CreateIlluminationMap(img, ilumination, scale);
+		//Filter::ApplyInvert(&ilumination, ilumination);
 
-		ilumination.ExportBMP("ilum " + std::to_string(scale));
+		ilumination.ExportBMP("ilum2 " + std::to_string(scale));
 
 		for (int x = 0; x < img->getWidth(); x++) {
 			for (int y = 0; y < img->getHeight(); y++) {
 
-				Color c = (img->GetPixel(x, y) * (a / ilumination.GetPixel(x/scale, y/scale).r))+ img->GetPixel(x, y);
+				float v = ilumination.GetPixel(x / scale, y / scale).r;
+				float vo = (v*2) / (v);
+
+				Color c = (img->GetPixel(x, y) * (a / vo)) + img->GetPixel(x, y);
+
 				_out.setPixel(c, x, y);
 			}
 		}

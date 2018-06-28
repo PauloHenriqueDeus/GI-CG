@@ -3,4 +3,4 @@ sphere 5 0 -40 0 0 0 5 material2
 sphere -5 0 -40 0 0 0 5 material4
 plane 0 -5 -40 80 0 0 15 15 material3
 light 0 0 0 1 1 1
-npr false
+npr true

@@ -129,7 +129,12 @@ public:
 	}
 
 	Color operator* (float f) {
+		if (f < 0) {
+			//f = (-f);
+			f = 0;
+		}
 		f = (f > 1) ? 1 : f;
+
 		Color c = *this;
 		c.r = c.r*f;
 		c.g = c.g*f;

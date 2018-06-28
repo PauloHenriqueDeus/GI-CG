@@ -1,6 +1,7 @@
 #pragma once
 #include "Color.h"
 #include "glm/glm/gtc/noise.hpp"
+#include <iostream>
 
 class Image {
 public:
@@ -28,6 +29,71 @@ public:
 			pixels[i] = image->pixels[i];
 		}
 
+	}
+
+	Image(char *filename) {
+		FILE *file;
+		unsigned long size;                 // size of the image in bytes.
+		//char temp;
+
+											// make sure the file is there.
+
+		fopen_s(&file, filename, "rb");
+
+		if (file) {
+
+			fseek(file, 18, SEEK_CUR);
+
+			{
+				unsigned char  b[4];
+				unsigned int i;
+
+				if (fread(b, 1, 4, file) < 4)
+					width = 0;
+
+				i = (b[3] << 24) | (b[2] << 16) | (b[1] << 8) | b[0];
+				width = i;
+			}
+			printf("Width of %s: %lu\n", filename, width);
+
+			{
+				unsigned char  b[4];
+				unsigned int i;
+
+				if (fread(b, 1, 4, file) < 4)
+					height = 0;
+
+				i = (b[3] << 24) | (b[2] << 16) | (b[1] << 8) | b[0];
+				height = i;
+			}
+			printf("Height of %s: %lu\n", filename, height);
+
+			size = width * height * 3; //4
+
+			fseek(file, 4, SEEK_CUR);
+			fseek(file, 24, SEEK_CUR);
+
+			channels = 4;
+
+			pixels = new unsigned char[width * height * 4];
+			unsigned char* buffer = new unsigned char[size];
+
+			fread_s(buffer, size, size, 1, file);
+
+			int j = 0;
+			for (int i = 0; i < size; i += 3) {
+				/*temp = image->data[i];
+				image->data[i] = image->data[i + 2];
+				image->data[i + 2] = temp;*/
+
+				pixels[j] = buffer[i];
+				pixels[j + 1] = buffer[i + 1];
+				pixels[j + 2] = buffer[i + 2];
+				pixels[j + 3] = 255;
+
+				j += 4;
+			}
+		}
 	}
 
 	~Image() {
@@ -220,21 +286,27 @@ public:
 
 		for (int x = 0; x < img->getWidth(); x++) {
 			for (int y = 0; y < img->getHeight(); y++) {
-				double nx = (double)x / img->getWidth() - 0.5, ny = (double)y / img->getHeight() - 0.5;
-				//float f = (1.0f / scale) * glm::perlin(glm::vec2(scale * nx, scale * ny));
+				double nx = (double)x / img->getWidth(), ny = (double)y / img->getHeight();
 
+				Color ca = (Color::White() * 0.5f * (1 - (1 - glm::simplex(glm::vec2(scale / 4 * nx, scale / 4 * ny))))) +
+					(Color::White() * 0.5f * (1 - (1 - glm::simplex(glm::vec2(scale / 3 * nx, scale / 2 * ny))))) +
+					(Color::White() * (1 - (1 - glm::simplex(glm::vec2(scale / 2 * nx, scale / 2 * ny))))) +
+					(Color::White() * (1 - glm::simplex(glm::vec2(scale * nx, scale * ny))));
 
-				double f = ((1.0 / scale) * glm::perlin(glm::vec2(scale * nx, scale  * ny))
-					+ (1.0/2/scale) * glm::perlin(glm::vec2(2 *scale  * nx, 2 *scale  * ny))
-					+ (1.0/4 / scale) * glm::perlin(glm::vec2(4  *scale * nx, 4 *scale  * ny))
-					+ (1.0/8 / scale) * glm::perlin(glm::vec2(8 *scale  * nx, 8  *scale * ny))
-					+ (1.0/16 / scale) * glm::perlin(glm::vec2(16 *scale  * nx, 16 *scale  * ny))
-					+ (1.0/32 / scale) * glm::perlin(glm::vec2(32 *scale  * nx, 32 *scale  * ny)));
+				float f = ca.r;
+				f = powf(f, 2);
+				ca = Color(f, f, f, 1.f);
 
-				f /= (1.0 / scale) + (1.0 / 2 / scale) + (1.0 / 8 / scale) + (1.0 / 16 / scale) + (1.0 / 32 / scale);
+				Color cb = (Color::White() * 0.5f * (1 - (1 - glm::simplex(glm::vec2(scale/2 / 4 * nx, scale/2 / 4 * ny))))) +
+					(Color::White() * 0.5f * (1 - (1 - glm::simplex(glm::vec2(scale/2 / 3 * nx, scale/2 / 2 * ny))))) +
+					(Color::White() * (1 - (1 - glm::simplex(glm::vec2(scale/2 / 2 * nx, scale/2 / 2 * ny))))) +
+					(Color::White() * (1 - glm::simplex(glm::vec2(scale/2 * nx, scale/2 * ny))));
 
-				Color c = Color::White() * f;
-				img->setPixel(c, x, y);
+				//f = cb.r;
+				//f = powf(f, 2);
+				//cb = Color(f, f, f, 1.f);
+				//
+				img->setPixel(ca*cb, x, y);
 			}
 		}
 	}
